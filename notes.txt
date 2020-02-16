@@ -1,0 +1,4 @@
+Vil finne en måte å sette sammen "Obj" objekter i en 3D struktur
+    Regne ut en funksjon for submersion basert på tyngden til strukturen
+    Regne ut center of buoyancy for delene så langt de er submerged.
+
