@@ -77,10 +77,10 @@ if __name__ == '__main__':
     density = m/v
     print(density)
 
-    dy = 0.075
+    dy = 0.110
     h = 1
     ry = dy/2
-    ri = ry - 0.003
+    ri = ry - 0.004
     vy = math.pi * ry ** 2 * h
     vi = math.pi * ri ** 2 * h
     v = vy - vi
