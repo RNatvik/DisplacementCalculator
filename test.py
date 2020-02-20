@@ -1,5 +1,5 @@
 import math
-
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -168,9 +168,12 @@ def calculate_bm(r, y, displaced_volume, num_poles=4):
     return bm
 
 
-def plot(bm, cg, cb):
-    plt.figure()
-    plt.plot(0, 0, 'x')
+def plot(bm, cg, cb, title, data):
+    os.makedirs(os.path.dirname(f'graphs/{title}/data.txt'), exist_ok=True)
+    with open(f'graphs/{title}/data.txt', 'w') as file:
+        file.write(data)
+    fig = plt.figure()
+    plt.plot(0, 0, 'o')
     plt.plot(0, cb[2] + bm[2], 'x')
     plt.plot(0, cg[2], 'x')
     plt.plot(0, cb[2], 'x')
@@ -178,21 +181,24 @@ def plot(bm, cg, cb):
     plt.xlim([-0.1, 0.1])
     plt.ylim([-1.1, 0.1])
     plt.grid()
+    plt.title(title)
     plt.show()
+    fig.savefig(f'graphs/{title}/figure.png')
 
 
 def main():
-    platform_width = 1
-    platform_length = 1
+    platform_width = 0.7
+    platform_length = 1.0
     pipe_diameter = 0.11
     pipe_radius = pipe_diameter / 2
     vertical_pipe_length = 1
-    horizontal_pipe_length = 1
+    horizontal_pipe_length = platform_length
     vertical_pipe_volume = math.pi * pipe_radius ** 2 * vertical_pipe_length
     horizontal_pipe_volume = math.pi * pipe_radius ** 2 * horizontal_pipe_length
     ballast_density = 1025.0  # kg/m³
+    additional_ballast_weight = 15
 
-    root = Component(4.3, 0, description='Platform')
+    root = Component(2.92 + 0.26 + 0.939 + 0.162, 0, description='Platform')
     electronics = Component(
         7.18 + 0.046 + 0.007 + 0.1 + 0.302 + 0.004 + 0.19, volume=0,
         description='electronics', parent=root, parent_vector=[0, 0, 0.05]
@@ -268,35 +274,42 @@ def main():
         submerged=1
     )
     additional_ballast = Component(
-        5, 0,
+        additional_ballast_weight, 0,
         description='additional ballast',
-        parent=root, parent_vector=[0, 0, -vertical_pipe_length]
+        parent=root, parent_vector=[0, 0, -(vertical_pipe_length-0.06)]
     )
-    # pipeML = Component(
-    #     1.44 * vertical_pipe_length, vertical_pipe_volume,
-    #     description='pipeML',
-    #     parent=root, parent_vector=[0, -platform_width / 2, -vertical_pipe_length / 2],
-    #     submerged=0
-    # )
-    # pipeMR = Component(
-    #     1.44 * vertical_pipe_length, vertical_pipe_volume,
-    #     description='pipeMR',
-    #     parent=root, parent_vector=[0, platform_width / 2, -vertical_pipe_length / 2],
-    #     submerged=0
-    # )
-
+    pipeML = Component(
+        1.44 * vertical_pipe_length, vertical_pipe_volume,
+        description='pipeML',
+        parent=root, parent_vector=[0, -platform_width / 2, -vertical_pipe_length / 2],
+        submerged=0
+    )
+    pipeMR = Component(
+        1.44 * vertical_pipe_length, vertical_pipe_volume,
+        description='pipeMR',
+        parent=root, parent_vector=[0, platform_width / 2, -vertical_pipe_length / 2],
+        submerged=0
+    )
 
     cg, weight = root.calculate_cg()
     cb, volume, submersion, submersion_rate = root.calculate_cb(vertical_pipe_length, fluid_density=1025.0)
-    bm = calculate_bm(pipe_radius, platform_width / 2, volume, num_poles=4)
-    plot(bm, cg, cb)
-    # print(root.get_tree())
-    print(f'Centre of gravity:   {cg}\n'
-          f'Centre of buoyancy:  {cb}\n'
-          f'Construction weight: {weight}\n'
-          f'Submerged volume:    {volume}\n'
-          f'Submersion / rate:   {submersion} / {submersion_rate}'
-          )
+    bm = calculate_bm(pipe_radius, platform_width / 2, volume, num_poles=6)
+    data = f'Parameters:\n' \
+           f'    Platform width:         {platform_width} [m]\n' \
+           f'    Platform length:        {platform_length} [m]\n' \
+           f'    Pipe diameter:          {pipe_diameter} [m]\n' \
+           f'    Vertical pipe length:   {vertical_pipe_length} [m]\n' \
+           f'    Horizontal pipe length: {horizontal_pipe_length} [m]\n' \
+           f'    Ballast density:        {ballast_density} [kg/m³]\n' \
+           f'    Additional ballast:     {additional_ballast_weight} [kg]\n' \
+           f'Centre of gravity:   {[round(x, 5) for x in cg.tolist()]} (x, y, z)\n' \
+           f'Centre of buoyancy:  {[round(x, 5) for x in cb.tolist()]} (x, y, z)\n' \
+           f'Total weight:        {weight} [kg]\n' \
+           f'Submerged volume:    {volume} [m³]\n' \
+           f'Submersion / rate:   {submersion} [m] / {submersion_rate} [ratio]'
+    plot(bm, cg, cb, f'110mm_6p_070x100_{additional_ballast_weight}_additional_ballast_height_compensated', data)
+    print(data)
+
 
 
 if __name__ == '__main__':
