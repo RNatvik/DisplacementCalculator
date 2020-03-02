@@ -4,25 +4,49 @@ import matplotlib.pyplot as plt
 from construction import Component, calculate_bm
 
 
-def plot(bm, cg, cb, data, title='', scrap_run=True):
-    # TODO: Make method create 3 plots (XY / top view, XZ / side view , YZ)
+def save_data(bm, cg, cb, data, title='', scrap_run=True):
     if scrap_run:
         title = 'scrap'
     os.makedirs(os.path.dirname(f'graphs/{title}/data.txt'), exist_ok=True)
     with open(f'graphs/{title}/data.txt', 'w') as file:
         file.write(data)
+    x = 0
+    y = 1
+    z = 2
+    yx = [(cb[y] + bm[y], cb[x] + bm[x]), (cg[y], cg[x]), (cb[y], cb[x])]
+    xz = [(cb[x] + bm[x], cb[z] + bm[z]), (cg[x], cg[z]), (cb[x], cb[z])]
+    yz = [(cb[y] + bm[y], cb[z] + bm[z]), (cg[y], cg[z]), (cb[y], cb[z])]
+    figYX = plot(yx, title=title, spice='Top view', axis_label=['Y', 'X'])
+    figXZ = plot(xz, title=title, spice='Side view', axis_label=['X', 'Z'])
+    figYZ = plot(yz, title=title, spice='Front view', axis_label=['Y', 'Z'])
+
+    figYX.savefig(f'graphs/{title}/figure_TopView.png')
+    figXZ.savefig(f'graphs/{title}/figure_SideView.png')
+    figYZ.savefig(f'graphs/{title}/figure_FrontView.png')
+
+
+def plot(xy, title='', spice='', axis_label=None):
+    """
+
+    :param xy: List of tuples representing 2D coordinates
+    :param title: The figure title, default empty
+    :param spice: Additional figure information for title, default empty
+    :param axis_label: Axis names, default x=X, y=Y
+    :return:
+    """
+    if axis_label is None:
+        axis_label = ['X', 'Y']
     fig = plt.figure()
     plt.plot(0, 0, 'o')
-    plt.plot(0, cb[2] + bm[2], 'x')
-    plt.plot(0, cg[2], 'x')
-    plt.plot(0, cb[2], 'x')
-    plt.legend(['origin', 'm', 'cg', 'cb'])
-    plt.xlim([-0.1, 0.1])
-    plt.ylim([-1.1, 0.1])
+    for x, y in xy:
+        plt.plot(x, y, 'x')
+    plt.legend(['origin', 'M', 'G', 'B'])
     plt.grid()
-    plt.title(title)
+    plt.title(f'{title} {spice}')
+    plt.xlabel(axis_label[0])
+    plt.ylabel(axis_label[1])
     plt.show()
-    fig.savefig(f'graphs/{title}/figure.png')
+    return fig
 
 
 def main():
@@ -146,12 +170,13 @@ def main():
            f'Total weight:        {weight} [kg]\n' \
            f'Submerged volume:    {volume} [m³]\n' \
            f'Submersion / rate:   {submersion} [m] / {submersion_rate} [ratio]'
-    plot(
+    save_data(
         bm, cg, cb, data,
         title=f'110mm_6p_070x100_{additional_ballast_weight}_additional_ballast_height_compensated',
         scrap_run=True
     )
     print(data)
+
 
 if __name__ == '__main__':
     main()
