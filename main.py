@@ -155,7 +155,6 @@ def main():
         parent=root, parent_vector=[0, 0, -(vertical_pipe_length-0.15)]
     )
 
-
     cg, weight = root.calculate_cg()
     cb, volume, submersion, submersion_rate = root.calculate_cb(vertical_pipe_length, fluid_density=1025.0)
     bm = calculate_bm(pipe_radius, platform_width / 2, volume, num_poles=6)
