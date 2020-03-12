@@ -64,97 +64,17 @@ def main():
 
     root = Component(2.92 + 0.26 + 0.939 + 0.162, 0, description='Platform')
     electronics = Component(
-        7.18 + 0.046 + 0.007 + 0.1 + 0.302 + 0.004 + 0.19, volume=0,
+        0.046 + 0.007 + 0.1 + 0.302 + 0.004 + 0.19, volume=0,
         description='electronics', parent=root, parent_vector=[0, 0, 0.05]
     )
-    pipeFL = Component(
-        pipe_density * vertical_pipe_length, vertical_pipe_volume,
-        description='FL pipe',
-        parent=root, parent_vector=[platform_length / 2, -platform_width / 2, -vertical_pipe_length / 2],
-        submerged=0
-    )
-    pipeFR = Component(
-        pipe_density * vertical_pipe_length, vertical_pipe_volume,
-        description='FR pipe',
-        parent=root, parent_vector=[platform_length / 2, platform_width / 2, -vertical_pipe_length / 2],
-        submerged=0
-    )
-    pipeML = Component(
-        pipe_density * vertical_pipe_length, vertical_pipe_volume,
-        description='ML pipe',
-        parent=root, parent_vector=[0, -platform_width / 2, -vertical_pipe_length / 2],
-        submerged=0
-    )
-    pipeMR = Component(
-        pipe_density * vertical_pipe_length, vertical_pipe_volume,
-        description='MR pipe',
-        parent=root, parent_vector=[0, platform_width / 2, -vertical_pipe_length / 2],
-        submerged=0
-    )
-    pipeBL = Component(
-        pipe_density * vertical_pipe_length, vertical_pipe_volume,
-        description='BL pipe',
-        parent=root, parent_vector=[-platform_length / 2, -platform_width / 2, -vertical_pipe_length / 2],
-        submerged=0
-    )
-    pipeBR = Component(
-        pipe_density * vertical_pipe_length, vertical_pipe_volume,
-        description='BR pipe',
-        parent=root, parent_vector=[-platform_length / 2, platform_width / 2, -vertical_pipe_length / 2],
-        submerged=0
-    )
-    ballast_pipeR = Component(
-        pipe_density * horizontal_pipe_length, horizontal_pipe_volume,
-        description='Right ballast pipe',
-        parent=root, parent_vector=[0, platform_width / 2, -(vertical_pipe_length + pipe_radius)],
+    battery = Component(
+        7.18, 0.205*0.090*0.160,
+        description='battery', parent=root, parent_vector=[0, 0, -1],
         submerged=1
     )
-    ballast_pipeL = Component(
-        pipe_density * horizontal_pipe_length, horizontal_pipe_volume,
-        description='Left ballast pipe',
-        parent=root, parent_vector=[0, -platform_width / 2, -(vertical_pipe_length + pipe_radius)],
-        submerged=1
-    )
-    ballast1 = Component(
-        ballast_density * horizontal_pipe_volume, 0,
-        description='Ballast in left ballast pipe',
-        parent=ballast_pipeL
-    )
-    ballast2 = Component(
-        ballast_density * horizontal_pipe_volume, 0,
-        description='Ballast in right ballast pipe',
-        parent=ballast_pipeR
-    )
-    motorFL = Component(
-        1.3, 0.0005,
-        description='Front left motor',
-        parent=ballast_pipeL, parent_vector=[horizontal_pipe_length / 2, 0, -pipe_radius],
-        submerged=1
-    )
-    motorFR = Component(
-        1.3, 0.0005,
-        description='Front right motor',
-        parent=ballast_pipeR, parent_vector=[horizontal_pipe_length / 2, 0, -pipe_radius],
-        submerged=1
-    )
-    motorBL = Component(
-        1.3, 0.0005,
-        description='Back left motor',
-        parent=ballast_pipeL, parent_vector=[-horizontal_pipe_length / 2, 0, -pipe_radius],
-        submerged=1
-    )
-    motorBR = Component(
-        1.3, 0.0005,
-        description='Back right motor',
-        parent=ballast_pipeR, parent_vector=[-horizontal_pipe_length / 2, 0, -pipe_radius],
-        submerged=1
-    )
-    additional_ballast = Component(
-        additional_ballast_weight, 0,
-        description='additional ballast',
-        parent=root, parent_vector=[0, 0, -(vertical_pipe_length-0.15)]
-    )
+    vertical_pipeFR = Component(
 
+    )
     cg, weight = root.calculate_cg()
     cb, volume, submersion, submersion_rate = root.calculate_cb(vertical_pipe_length, fluid_density=1025.0)
     bm = calculate_bm(pipe_radius, platform_width / 2, volume, num_poles=6)
